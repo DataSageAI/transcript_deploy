@@ -106,7 +106,7 @@ else:
                 response_format='text',
                 file=arquivo_audio,
                 prompt=prompt_input,
-                stream=True  # Mantido conforme sua versão funciona
+                #stream=True  # Mantido conforme sua versão funciona
             )
             st.write(transcricao)
 
