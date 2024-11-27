@@ -28,7 +28,7 @@ else:
     # Inicializa o cliente OpenAI com a chave da API fornecida
     client = openai.OpenAI(api_key=st.session_state['api_key'])
 
-    if not 'transcricao_mic' in st.session_state:
+    if 'transcricao_mic' not in st.session_state:
         st.session_state['transcricao_mic'] = ''
 
     @st.cache_data
@@ -53,7 +53,7 @@ else:
                 language='pt',
                 response_format='text',
                 file=arquivo_audio,
-                prompt=prompt,
+                prompt=prompt
             )
             return transcricao
 
@@ -92,6 +92,14 @@ else:
                     st.session_state['transcricao_mic'] += transcricao
                     container.write(st.session_state['transcricao_mic'])
                     chunck_audio = pydub.AudioSegment.empty()
+                    # Adiciona o botão de copiar
+                    if st.button('Copiar Transcrição'):
+                        st.write('Transcrição copiada para a área de transferência!')
+                        st.markdown(f"""
+                            <script>
+                            navigator.clipboard.writeText(`{st.session_state['transcricao_mic']}`);
+                            </script>
+                            """, unsafe_allow_html=True)
             else:
                 break
 
@@ -99,16 +107,23 @@ else:
     def transcreve_tab_audio():
         prompt_input = st.text_input('(opcional) Digite o seu prompt', key='input_audio')
         arquivo_audio = st.file_uploader('Adicione um arquivo de áudio .mp3', type=['mp3'])
-        if not arquivo_audio is None:
+        if arquivo_audio is not None:
             transcricao = client.audio.transcriptions.create(
                 model='whisper-1',
                 language='pt',
                 response_format='text',
                 file=arquivo_audio,
-                prompt=prompt_input,
-                #stream=True  # Mantido conforme sua versão funciona
+                prompt=prompt_input
             )
             st.write(transcricao)
+            # Adiciona o botão de copiar
+            if st.button('Copiar Transcrição'):
+                st.write('Transcrição copiada para a área de transferência!')
+                st.markdown(f"""
+                    <script>
+                    navigator.clipboard.writeText(`{transcricao}`);
+                    </script>
+                    """, unsafe_allow_html=True)
 
     # MAIN =====================================
     def main():
