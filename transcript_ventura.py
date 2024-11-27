@@ -67,9 +67,7 @@ else:
         )
 
         if not webrtx_ctx.state.playing:
-            if st.session_state['transcricao_mic']:
-                st.text_area("Transcrição:", st.session_state['transcricao_mic'], height=200)
-                st.download_button('Baixar Transcrição', st.session_state['transcricao_mic'], file_name='transcricao.txt')
+            st.write(st.session_state['transcricao_mic'])
             return
 
         container = st.empty()
@@ -92,9 +90,16 @@ else:
                     chunck_audio.export(ARQUIVO_MIC_TEMP)
                     transcricao = transcreve_audio(ARQUIVO_MIC_TEMP, prompt_mic)
                     st.session_state['transcricao_mic'] += transcricao
-                    container.text_area("Transcrição:", st.session_state['transcricao_mic'], height=200)
-                    container.download_button('Baixar Transcrição', st.session_state['transcricao_mic'], file_name='transcricao.txt')
+                    container.write(st.session_state['transcricao_mic'])
                     chunck_audio = pydub.AudioSegment.empty()
+                    # Adiciona o botão de copiar
+                    if st.button('Copiar Transcrição'):
+                        st.write('Transcrição copiada para a área de transferência!')
+                        st.markdown(f"""
+                            <script>
+                            navigator.clipboard.writeText(`{st.session_state['transcricao_mic']}`);
+                            </script>
+                            """, unsafe_allow_html=True)
             else:
                 break
 
@@ -110,8 +115,15 @@ else:
                 file=arquivo_audio,
                 prompt=prompt_input
             )
-            st.text_area("Transcrição:", transcricao, height=200)
-            st.download_button('Baixar Transcrição', transcricao, file_name='transcricao.txt')
+            st.write(transcricao)
+            # Adiciona o botão de copiar
+            if st.button('Copiar Transcrição'):
+                st.write('Transcrição copiada para a área de transferência!')
+                st.markdown(f"""
+                    <script>
+                    navigator.clipboard.writeText(`{transcricao}`);
+                    </script>
+                    """, unsafe_allow_html=True)
 
     # MAIN =====================================
     def main():
@@ -125,3 +137,4 @@ else:
 
     if __name__ == '__main__':
         main()
+
