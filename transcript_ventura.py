@@ -10,8 +10,6 @@ import pydub
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-import os  # Importação necessária
-
 PASTA_TEMP = Path(__file__).parent / 'temp'
 PASTA_TEMP.mkdir(exist_ok=True)
 ARQUIVO_AUDIO_TEMP = PASTA_TEMP / 'audio.mp3'
@@ -27,10 +25,8 @@ if not st.session_state['api_key']:
         st.session_state['api_key'] = api_key
         st.experimental_rerun()  # Recarrega o app para que o campo desapareça
 else:
-    # Define a chave da API
-    openai.api_key = st.session_state['api_key']
-
-    client = openai.OpenAI()
+    # Inicializa o cliente OpenAI com a chave da API fornecida
+    client = openai.OpenAI(api_key=st.session_state['api_key'])
 
     if not 'transcricao_mic' in st.session_state:
         st.session_state['transcricao_mic'] = ''
