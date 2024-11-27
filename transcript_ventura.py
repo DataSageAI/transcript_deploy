@@ -10,30 +10,20 @@ import pydub
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
+import os  # Importação necessária
+
 PASTA_TEMP = Path(__file__).parent / 'temp'
 PASTA_TEMP.mkdir(exist_ok=True)
 ARQUIVO_AUDIO_TEMP = PASTA_TEMP / 'audio.mp3'
 ARQUIVO_MIC_TEMP = PASTA_TEMP / 'mic.mp3'
 
-# Solicita ao usuário que insira a chave API da OpenAI sem exibi-la
-api_key_input = st.text_input("Por favor, insira sua chave API da OpenAI:", type="password")
+# Solicita que o usuário insira a chave da API
+api_key = st.text_input("Digite sua chave API OpenAI:", type='password')
 
-if api_key_input:
-    client = openai.OpenAI(api_key=api_key_input)
-else:
-    st.warning("Por favor, insira sua chave API da OpenAI.")
-    st.stop()
+# Define a chave da API no ambiente
+os.environ["OPENAI_API_KEY"] = api_key
 
-def transcreve_audio(caminho_audio, prompt):
-    with open(caminho_audio, 'rb') as arquivo_audio:
-        transcricao = client.audio.transcriptions.create(
-            model='whisper-1',
-            language='pt',
-            response_format='text',
-            file=arquivo_audio,
-            prompt=prompt,
-        )
-        return transcricao
+client = openai.OpenAI()
 
 if not 'transcricao_mic' in st.session_state:
     st.session_state['transcricao_mic'] = ''
@@ -41,6 +31,7 @@ if not 'transcricao_mic' in st.session_state:
 @st.cache_data
 def get_ice_servers():
     return [{'urls': ['stun:stun.l.google.com:19302']}]
+
 
 def adiciona_chunck_de_audio(frames_de_audio, chunck_audio):
     for frame in frames_de_audio:
@@ -52,6 +43,17 @@ def adiciona_chunck_de_audio(frames_de_audio, chunck_audio):
         )
         chunck_audio += sound
     return chunck_audio
+
+def transcreve_audio(caminho_audio, prompt):
+    with open(caminho_audio, 'rb') as arquivo_audio:
+        transcricao = client.audio.transcriptions.create(
+            model='whisper-1',
+            language='pt',
+            response_format='text',
+            file=arquivo_audio,
+            prompt=prompt,
+        )
+        return transcricao
 
 def transcreve_tab_mic():
     prompt_mic = st.text_input('(opcional) Digite o seu prompt', key='input_mic')
@@ -90,6 +92,7 @@ def transcreve_tab_mic():
                 chunck_audio = pydub.AudioSegment.empty()
         else:
             break
+
 
 # TRANSCREVE AUDIO =====================================
 def transcreve_tab_audio():
