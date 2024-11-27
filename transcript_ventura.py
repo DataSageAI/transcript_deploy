@@ -92,14 +92,6 @@ else:
                     st.session_state['transcricao_mic'] += transcricao
                     container.write(st.session_state['transcricao_mic'])
                     chunck_audio = pydub.AudioSegment.empty()
-                    # Adiciona o botão de copiar
-                    if st.button('Copiar Transcrição'):
-                        st.write('Transcrição copiada para a área de transferência!')
-                        st.markdown(f"""
-                            <script>
-                            navigator.clipboard.writeText(`{st.session_state['transcricao_mic']}`);
-                            </script>
-                            """, unsafe_allow_html=True)
             else:
                 break
 
@@ -116,14 +108,6 @@ else:
                 prompt=prompt_input
             )
             st.write(transcricao)
-            # Adiciona o botão de copiar
-            if st.button('Copiar Transcrição'):
-                st.write('Transcrição copiada para a área de transferência!')
-                st.markdown(f"""
-                    <script>
-                    navigator.clipboard.writeText(`{transcricao}`);
-                    </script>
-                    """, unsafe_allow_html=True)
 
     # MAIN =====================================
     def main():
@@ -137,4 +121,3 @@ else:
 
     if __name__ == '__main__':
         main()
-
