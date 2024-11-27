@@ -67,7 +67,9 @@ else:
         )
 
         if not webrtx_ctx.state.playing:
-            st.write(st.session_state['transcricao_mic'])
+            if st.session_state['transcricao_mic']:
+                st.text_area("Transcrição:", st.session_state['transcricao_mic'], height=200)
+                st.download_button('Baixar Transcrição', st.session_state['transcricao_mic'], file_name='transcricao.txt')
             return
 
         container = st.empty()
@@ -90,16 +92,9 @@ else:
                     chunck_audio.export(ARQUIVO_MIC_TEMP)
                     transcricao = transcreve_audio(ARQUIVO_MIC_TEMP, prompt_mic)
                     st.session_state['transcricao_mic'] += transcricao
-                    container.write(st.session_state['transcricao_mic'])
+                    container.text_area("Transcrição:", st.session_state['transcricao_mic'], height=200)
+                    container.download_button('Baixar Transcrição', st.session_state['transcricao_mic'], file_name='transcricao.txt')
                     chunck_audio = pydub.AudioSegment.empty()
-                    # Adiciona o botão de copiar
-                    if st.button('Copiar Transcrição'):
-                        st.write('Transcrição copiada para a área de transferência!')
-                        st.markdown(f"""
-                            <script>
-                            navigator.clipboard.writeText(`{st.session_state['transcricao_mic']}`);
-                            </script>
-                            """, unsafe_allow_html=True)
             else:
                 break
 
@@ -115,15 +110,8 @@ else:
                 file=arquivo_audio,
                 prompt=prompt_input
             )
-            st.write(transcricao)
-            # Adiciona o botão de copiar
-            if st.button('Copiar Transcrição'):
-                st.write('Transcrição copiada para a área de transferência!')
-                st.markdown(f"""
-                    <script>
-                    navigator.clipboard.writeText(`{transcricao}`);
-                    </script>
-                    """, unsafe_allow_html=True)
+            st.text_area("Transcrição:", transcricao, height=200)
+            st.download_button('Baixar Transcrição', transcricao, file_name='transcricao.txt')
 
     # MAIN =====================================
     def main():
